@@ -1,0 +1,77 @@
+[0.000000] (-) TimerEvent: {}
+[0.001238] (hexapod_vision) JobQueued: {'identifier': 'hexapod_vision', 'dependencies': OrderedDict()}
+[0.001470] (hexapod_vision) JobStarted: {'identifier': 'hexapod_vision'}
+[0.098123] (-) TimerEvent: {}
+[0.198817] (-) TimerEvent: {}
+[0.299492] (-) TimerEvent: {}
+[0.400374] (-) TimerEvent: {}
+[0.501045] (-) TimerEvent: {}
+[0.601873] (-) TimerEvent: {}
+[0.702479] (-) TimerEvent: {}
+[0.803045] (-) TimerEvent: {}
+[0.903641] (-) TimerEvent: {}
+[1.004276] (-) TimerEvent: {}
+[1.105058] (-) TimerEvent: {}
+[1.207545] (-) TimerEvent: {}
+[1.309178] (-) TimerEvent: {}
+[1.409789] (-) TimerEvent: {}
+[1.510406] (-) TimerEvent: {}
+[1.611000] (-) TimerEvent: {}
+[1.713786] (-) TimerEvent: {}
+[1.814664] (-) TimerEvent: {}
+[1.915248] (-) TimerEvent: {}
+[2.015828] (-) TimerEvent: {}
+[2.116444] (-) TimerEvent: {}
+[2.217062] (-) TimerEvent: {}
+[2.317707] (-) TimerEvent: {}
+[2.418319] (-) TimerEvent: {}
+[2.519259] (-) TimerEvent: {}
+[2.621366] (-) TimerEvent: {}
+[2.702858] (hexapod_vision) Command: {'cmd': ['/usr/bin/python3', '-W', 'ignore:setup.py install is deprecated', '-W', 'ignore:easy_install command is deprecated', 'setup.py', 'egg_info', '--egg-base', '../../build/hexapod_vision', 'build', '--build-base', '/home/hexapod/ros2_ws/build/hexapod_vision/build', 'install', '--record', '/home/hexapod/ros2_ws/build/hexapod_vision/install.log', '--single-version-externally-managed', 'install_data'], 'cwd': '/home/hexapod/ros2_ws/src/hexapod_vision', 'env': {'LESSOPEN': '| /usr/bin/lesspipe %s', 'USER': 'hexapod', 'SSH_CLIENT': '192.168.68.113 62180 22', 'XDG_SESSION_TYPE': 'tty', 'GIT_ASKPASS': '/home/hexapod/.vscode-server/cli/servers/Stable-7c6fdfb0b8f2f675eb0b47f3d95eeca78962565b/server/extensions/git/dist/askpass.sh', 'SHLVL': '1', 'LD_LIBRARY_PATH': '/opt/ros/humble/lib/aarch64-linux-gnu:/opt/ros/humble/lib', 'BROWSER': '/home/hexapod/.vscode-server/cli/servers/Stable-7c6fdfb0b8f2f675eb0b47f3d95eeca78962565b/server/bin/helpers/browser.sh', 'MOTD_SHOWN': 'pam', 'HOME': '/home/hexapod', 'OLDPWD': '/home/hexapod/ros2_ws/src', 'TERM_PROGRAM_VERSION': '1.99.1', 'VSCODE_IPC_HOOK_CLI': '/run/user/1000/vscode-ipc-32eef7b4-9e59-49c9-a0af-7c9267d4c7a6.sock', 'ROS_PYTHON_VERSION': '3', 'VSCODE_GIT_ASKPASS_MAIN': '/home/hexapod/.vscode-server/cli/servers/Stable-7c6fdfb0b8f2f675eb0b47f3d95eeca78962565b/server/extensions/git/dist/askpass-main.js', 'VSCODE_GIT_ASKPASS_NODE': '/home/hexapod/.vscode-server/cli/servers/Stable-7c6fdfb0b8f2f675eb0b47f3d95eeca78962565b/server/node', 'SSL_CERT_FILE': '/usr/lib/ssl/certs/ca-certificates.crt', 'PYDEVD_DISABLE_FILE_VALIDATION': '1', 'BUNDLED_DEBUGPY_PATH': '/home/hexapod/.vscode-server/extensions/ms-python.debugpy-2025.6.0-linux-arm64/bundled/libs/debugpy', 'DBUS_SESSION_BUS_ADDRESS': 'unix:path=/run/user/1000/bus', 'COLORTERM': 'truecolor', 'COLCON_PREFIX_PATH': '/home/hexapod/ros2_ws/install:/home/hexapod/ros2_ws/src/install', 'ROS_DISTRO': 'humble', 'LOGNAME': 'hexapod', '_': '/usr/bin/colcon', 'ROS_VERSION': '2', 'XDG_SESSION_CLASS': 'user', 'TERM': 'xterm-256color', 'XDG_SESSION_ID': '1', 'ROS_LOCALHOST_ONLY': '0', 'PATH': '/home/hexapod/.vscode-server/cli/servers/Stable-7c6fdfb0b8f2f675eb0b47f3d95eeca78962565b/server/bin/remote-cli:/home/hexapod/.local/bin:/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/home/hexapod/.vscode-server/data/User/globalStorage/github.copilot-chat/debugCommand:/home/hexapod/.vscode-server/extensions/ms-python.debugpy-2025.6.0-linux-arm64/bundled/scripts/noConfigScripts', 'XDG_RUNTIME_DIR': '/run/user/1000', 'SSL_CERT_DIR': '/usr/lib/ssl/certs', 'VSCODE_DEBUGPY_ADAPTER_ENDPOINTS': '/home/hexapod/.vscode-server/extensions/ms-python.debugpy-2025.6.0-linux-arm64/.noConfigDebugAdapterEndpoints/endpoint-b1262a3b89dcd860.txt', 'LANG': 'en_US.UTF-8', 'LS_COLORS': 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:', 'VSCODE_GIT_IPC_HANDLE': '/run/user/1000/vscode-git-4a19f492a0.sock', 'TERM_PROGRAM': 'vscode', 'AMENT_PREFIX_PATH': '/home/hexapod/ros2_ws/src/install/hexapod_vision:/opt/ros/humble', 'SHELL': '/bin/bash', 'LESSCLOSE': '/usr/bin/lesspipe %s %s', 'VSCODE_GIT_ASKPASS_EXTRA_ARGS': '', 'PWD': '/home/hexapod/ros2_ws/build/hexapod_vision', 'LC_ALL': 'en_US.UTF-8', 'SSH_CONNECTION': '192.168.68.113 62180 192.168.68.100 22', 'XDG_DATA_DIRS': '/usr/local/share:/usr/share:/var/lib/snapd/desktop', 'PYTHONPATH': '/home/hexapod/ros2_ws/build/hexapod_vision/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/hexapod/ros2_ws/install/hexapod_vision/lib/python3.10/site-packages:/home/hexapod/ros2_ws/src/install/hexapod_vision/lib/python3.10/site-packages:/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages', 'COLCON': '1'}, 'shell': False}
+[2.721550] (-) TimerEvent: {}
+[2.822851] (-) TimerEvent: {}
+[2.923517] (-) TimerEvent: {}
+[3.024138] (-) TimerEvent: {}
+[3.124981] (-) TimerEvent: {}
+[3.225630] (-) TimerEvent: {}
+[3.326225] (-) TimerEvent: {}
+[3.426818] (-) TimerEvent: {}
+[3.527403] (-) TimerEvent: {}
+[3.628024] (-) TimerEvent: {}
+[3.690802] (hexapod_vision) StdoutLine: {'line': b'running egg_info\n'}
+[3.693187] (hexapod_vision) StdoutLine: {'line': b'creating ../../build/hexapod_vision/hexapod_vision.egg-info\n'}
+[3.693879] (hexapod_vision) StdoutLine: {'line': b'writing ../../build/hexapod_vision/hexapod_vision.egg-info/PKG-INFO\n'}
+[3.695074] (hexapod_vision) StdoutLine: {'line': b'writing dependency_links to ../../build/hexapod_vision/hexapod_vision.egg-info/dependency_links.txt\n'}
+[3.695689] (hexapod_vision) StdoutLine: {'line': b'writing entry points to ../../build/hexapod_vision/hexapod_vision.egg-info/entry_points.txt\n'}
+[3.696270] (hexapod_vision) StdoutLine: {'line': b'writing requirements to ../../build/hexapod_vision/hexapod_vision.egg-info/requires.txt\n'}
+[3.696833] (hexapod_vision) StdoutLine: {'line': b'writing top-level names to ../../build/hexapod_vision/hexapod_vision.egg-info/top_level.txt\n'}
+[3.697762] (hexapod_vision) StdoutLine: {'line': b"writing manifest file '../../build/hexapod_vision/hexapod_vision.egg-info/SOURCES.txt'\n"}
+[3.704970] (hexapod_vision) StdoutLine: {'line': b"reading manifest file '../../build/hexapod_vision/hexapod_vision.egg-info/SOURCES.txt'\n"}
+[3.707946] (hexapod_vision) StdoutLine: {'line': b"writing manifest file '../../build/hexapod_vision/hexapod_vision.egg-info/SOURCES.txt'\n"}
+[3.708620] (hexapod_vision) StdoutLine: {'line': b'running build\n'}
+[3.709106] (hexapod_vision) StdoutLine: {'line': b'running build_py\n'}
+[3.709563] (hexapod_vision) StdoutLine: {'line': b'creating /home/hexapod/ros2_ws/build/hexapod_vision/build\n'}
+[3.710171] (hexapod_vision) StdoutLine: {'line': b'creating /home/hexapod/ros2_ws/build/hexapod_vision/build/lib\n'}
+[3.710689] (hexapod_vision) StdoutLine: {'line': b'creating /home/hexapod/ros2_ws/build/hexapod_vision/build/lib/hexapod_vision\n'}
+[3.711070] (hexapod_vision) StdoutLine: {'line': b'copying hexapod_vision/__init__.py -> /home/hexapod/ros2_ws/build/hexapod_vision/build/lib/hexapod_vision\n'}
+[3.711520] (hexapod_vision) StdoutLine: {'line': b'running install\n'}
+[3.712586] (hexapod_vision) StdoutLine: {'line': b'running install_lib\n'}
+[3.715378] (hexapod_vision) StdoutLine: {'line': b'creating /home/hexapod/ros2_ws/install/hexapod_vision/lib/python3.10/site-packages/hexapod_vision\n'}
+[3.715915] (hexapod_vision) StdoutLine: {'line': b'copying /home/hexapod/ros2_ws/build/hexapod_vision/build/lib/hexapod_vision/__init__.py -> /home/hexapod/ros2_ws/install/hexapod_vision/lib/python3.10/site-packages/hexapod_vision\n'}
+[3.718105] (hexapod_vision) StdoutLine: {'line': b'byte-compiling /home/hexapod/ros2_ws/install/hexapod_vision/lib/python3.10/site-packages/hexapod_vision/__init__.py to __init__.cpython-310.pyc\n'}
+[3.719244] (hexapod_vision) StdoutLine: {'line': b'running install_data\n'}
+[3.719726] (hexapod_vision) StdoutLine: {'line': b'creating /home/hexapod/ros2_ws/install/hexapod_vision/share/ament_index\n'}
+[3.720203] (hexapod_vision) StdoutLine: {'line': b'creating /home/hexapod/ros2_ws/install/hexapod_vision/share/ament_index/resource_index\n'}
+[3.720728] (hexapod_vision) StdoutLine: {'line': b'creating /home/hexapod/ros2_ws/install/hexapod_vision/share/ament_index/resource_index/packages\n'}
+[3.721061] (hexapod_vision) StdoutLine: {'line': b'copying resource/hexapod_vision -> /home/hexapod/ros2_ws/install/hexapod_vision/share/ament_index/resource_index/packages\n'}
+[3.721526] (hexapod_vision) StdoutLine: {'line': b'copying package.xml -> /home/hexapod/ros2_ws/install/hexapod_vision/share/hexapod_vision\n'}
+[3.721938] (hexapod_vision) StdoutLine: {'line': b'running install_egg_info\n'}
+[3.728206] (-) TimerEvent: {}
+[3.728781] (hexapod_vision) StdoutLine: {'line': b'Copying ../../build/hexapod_vision/hexapod_vision.egg-info to /home/hexapod/ros2_ws/install/hexapod_vision/lib/python3.10/site-packages/hexapod_vision-0.0.0-py3.10.egg-info\n'}
+[3.733631] (hexapod_vision) StdoutLine: {'line': b'running install_scripts\n'}
+[3.813230] (hexapod_vision) StdoutLine: {'line': b"writing list of installed files to '/home/hexapod/ros2_ws/build/hexapod_vision/install.log'\n"}
+[3.828515] (-) TimerEvent: {}
+[3.929467] (-) TimerEvent: {}
+[3.931902] (hexapod_vision) CommandEnded: {'returncode': 0}
+[3.977302] (hexapod_vision) JobEnded: {'identifier': 'hexapod_vision', 'rc': 0}
+[3.979728] (-) EventReactorShutdown: {}

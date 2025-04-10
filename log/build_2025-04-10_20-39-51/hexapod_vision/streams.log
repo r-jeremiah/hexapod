@@ -1,0 +1,24 @@
+[2.605s] Invoking command in '/home/hexapod/ros2_ws/src/hexapod_vision': PYTHONPATH=/home/hexapod/ros2_ws/build/hexapod_vision/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/hexapod/ros2_ws/install/hexapod_vision/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/hexapod_vision build --build-base /home/hexapod/ros2_ws/build/hexapod_vision/build install --record /home/hexapod/ros2_ws/build/hexapod_vision/install.log --single-version-externally-managed install_data
+[3.609s] running egg_info
+[3.611s] writing ../../build/hexapod_vision/hexapod_vision.egg-info/PKG-INFO
+[3.612s] writing dependency_links to ../../build/hexapod_vision/hexapod_vision.egg-info/dependency_links.txt
+[3.613s] writing entry points to ../../build/hexapod_vision/hexapod_vision.egg-info/entry_points.txt
+[3.614s] writing requirements to ../../build/hexapod_vision/hexapod_vision.egg-info/requires.txt
+[3.614s] writing top-level names to ../../build/hexapod_vision/hexapod_vision.egg-info/top_level.txt
+[3.623s] reading manifest file '../../build/hexapod_vision/hexapod_vision.egg-info/SOURCES.txt'
+[3.626s] writing manifest file '../../build/hexapod_vision/hexapod_vision.egg-info/SOURCES.txt'
+[3.627s] running build
+[3.628s] running build_py
+[3.628s] copying hexapod_vision/amg8833_publisher.py -> /home/hexapod/ros2_ws/build/hexapod_vision/build/lib/hexapod_vision
+[3.630s] running install
+[3.631s] running install_lib
+[3.635s] copying /home/hexapod/ros2_ws/build/hexapod_vision/build/lib/hexapod_vision/amg8833_publisher.py -> /home/hexapod/ros2_ws/install/hexapod_vision/lib/python3.10/site-packages/hexapod_vision
+[3.638s] byte-compiling /home/hexapod/ros2_ws/install/hexapod_vision/lib/python3.10/site-packages/hexapod_vision/amg8833_publisher.py to amg8833_publisher.cpython-310.pyc
+[3.641s] running install_data
+[3.642s] running install_egg_info
+[3.649s] removing '/home/hexapod/ros2_ws/install/hexapod_vision/lib/python3.10/site-packages/hexapod_vision-0.0.0-py3.10.egg-info' (and everything under it)
+[3.650s] Copying ../../build/hexapod_vision/hexapod_vision.egg-info to /home/hexapod/ros2_ws/install/hexapod_vision/lib/python3.10/site-packages/hexapod_vision-0.0.0-py3.10.egg-info
+[3.656s] running install_scripts
+[3.735s] Installing amg8833_publisher script to /home/hexapod/ros2_ws/install/hexapod_vision/lib/hexapod_vision
+[3.737s] writing list of installed files to '/home/hexapod/ros2_ws/build/hexapod_vision/install.log'
+[3.871s] Invoked command in '/home/hexapod/ros2_ws/src/hexapod_vision' returned '0': PYTHONPATH=/home/hexapod/ros2_ws/build/hexapod_vision/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/hexapod/ros2_ws/install/hexapod_vision/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/hexapod_vision build --build-base /home/hexapod/ros2_ws/build/hexapod_vision/build install --record /home/hexapod/ros2_ws/build/hexapod_vision/install.log --single-version-externally-managed install_data

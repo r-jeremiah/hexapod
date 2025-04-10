@@ -1,0 +1,3 @@
+source;share/hexapod_vision/hook/pythonpath.ps1
+source;share/hexapod_vision/hook/pythonpath.dsv
+source;share/hexapod_vision/hook/pythonpath.sh
