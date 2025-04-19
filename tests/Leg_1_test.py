@@ -5,14 +5,14 @@ from adafruit_pca9685 import PCA9685
 import pigpio
 
 # Servo channel definitions (on PCA9685)
-COXA_SERVO = 12
-FEMUR_SERVO = 13
-TIBIA_SERVO = 14
-TARSUS_SERVO = 15
+COXA_SERVO = 15
+FEMUR_SERVO = 14
+TIBIA_SERVO = 13
+TARSUS_SERVO = 12
 
 # GPIO pin definitions (Radiolink channels)
-CH1_GPIO = 17  # Gait (coxa, femur, tibia)
-CH2_GPIO = 27  # Tarsus torsion
+CH1_GPIO = 17  # Gait (femur, tibia,tarsus)
+CH2_GPIO = 27  # Coxa torsion
 CH5_GPIO = 22  # Gait toggle
 
 # RC input pulse range (microseconds)
@@ -97,8 +97,8 @@ try:
         if gait_active:
             # Example predefined gait angles
             coxa_angle = rc_to_angle(ch1_pw)
-            femur_angle = 90 + 30 * ((ch1_pw - 1500) / 500.0)  # Example gait swing
-            tibia_angle = 90 - 20 * ((ch1_pw - 1500) / 500.0)
+            femur_angle = 90 + 90 * ((ch1_pw - 1500) / 500.0)  # Example gait swing
+            tibia_angle = 90 - 90 * ((ch1_pw - 1500) / 500.0)
 
             pca.channels[COXA_SERVO].duty_cycle = angle_to_duty_cycle(coxa_angle)
             pca.channels[FEMUR_SERVO].duty_cycle = angle_to_duty_cycle(femur_angle)

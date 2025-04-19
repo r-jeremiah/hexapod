@@ -4,6 +4,10 @@ from sensor_msgs.msg import Imu
 from std_msgs.msg import Header
 from mpu6050 import mpu6050
 import math
+import sys
+sys.path.append('/home/hexapod/Madgwick_Filter')
+
+from madgwick_filter import MadgwickAHRS
 
 class MPU6050Publisher(Node):
     def __init__(self):

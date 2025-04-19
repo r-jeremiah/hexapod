@@ -1,0 +1,32 @@
+# Ignore build artifacts
+build/
+install/
+log/
+
+# Ignore specific files in build and install directories
+*.sh.env
+*.sh
+*.pyc
+*.pyo
+*.pyd
+*.log
+*.tmp
+*.swp
+*.bak
+
+# Ignore Python cache files
+__pycache__/
+*.py[cod]
+
+# Ignore editor/IDE-specific files
+.vscode/
+*.code-workspace
+
+# Ignore system files
+.DS_Store
+Thumbs.db
+
+# Ignore ROS2-specific generated files
+*.dsv
+*.colcon_install_layout
+COLCON_IGNORE
