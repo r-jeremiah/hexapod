@@ -9,8 +9,7 @@
 
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Lesser General Public License for more details.
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more details.
 
     You should have received a copy of the GNU Lesser General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
@@ -28,15 +27,17 @@ class MadgwickAHRS:
     beta = 1
     zeta = 0
 
-    def __init__(self, sampleperiod=None, quaternion=None, beta=None, zeta=None):
+    def __init__(self, sampleperiod=None, quaternion=None, beta=None, zeta=None, sensor=None):
         """
         Initialize the class with the given parameters.
         :param sampleperiod: The sample period
         :param quaternion: Initial quaternion
         :param beta: Algorithm gain beta
-        :param beta: Algorithm gain zeta
+        :param zeta: Algorithm gain zeta
+        :param sensor: Sensor object providing accelerometer and gyroscope data
         :return:
         """
+        self.sensor = sensor
         if sampleperiod is not None:
             self.samplePeriod = sampleperiod
         if quaternion is not None:
@@ -54,6 +55,17 @@ class MadgwickAHRS:
         :param magnetometer: A three-element array containing the magnetometer data. Can be any unit since a normalized value is used.
         :return:
         """
+        try:
+            if self.sensor is None:
+                print("Error: Sensor object is not initialized.")
+                return  # Skip this iteration if the sensor is not provided
+
+            accel = self.sensor.get_accel_data()
+            gyro = self.sensor.get_gyro_data()
+        except OSError as e:
+            print(f"Error: I2C Communication Error: {e}")
+            return  # Skip this iteration if the sensor is not responding
+
         q = self.quaternion
 
         gyroscope = np.array(gyroscope, dtype=float).flatten()
@@ -110,7 +122,7 @@ class MadgwickAHRS:
 
     def update_imu(self, gyroscope, accelerometer):
         """
-        Perform one update step with data from a IMU sensor array
+        Perform one update step with data from an IMU sensor array
         :param gyroscope: A three-element array containing the gyroscope data in radians per second.
         :param accelerometer: A three-element array containing the accelerometer data. Can be any unit since a normalized value is used.
         """
@@ -120,21 +132,22 @@ class MadgwickAHRS:
         accelerometer = np.array(accelerometer, dtype=float).flatten()
 
         # Normalise accelerometer measurement
-        if norm(accelerometer) is 0:
-            warnings.warn("accelerometer is zero")
+        norm_accel = norm(accelerometer)
+        if norm_accel == 0:
+            warnings.warn("Accelerometer norm is zero. Skipping update.")
             return
-        accelerometer /= norm(accelerometer)
+        accelerometer /= norm_accel
 
         # Gradient descent algorithm corrective step
         f = np.array([
-            2*(q[1]*q[3] - q[0]*q[2]) - accelerometer[0],
-            2*(q[0]*q[1] + q[2]*q[3]) - accelerometer[1],
-            2*(0.5 - q[1]**2 - q[2]**2) - accelerometer[2]
+            2 * (q[1] * q[3] - q[0] * q[2]) - accelerometer[0],
+            2 * (q[0] * q[1] + q[2] * q[3]) - accelerometer[1],
+            2 * (0.5 - q[1]**2 - q[2]**2) - accelerometer[2]
         ])
         j = np.array([
-            [-2*q[2], 2*q[3], -2*q[0], 2*q[1]],
-            [2*q[1], 2*q[0], 2*q[3], 2*q[2]],
-            [0, -4*q[1], -4*q[2], 0]
+            [-2 * q[2], 2 * q[3], -2 * q[0], 2 * q[1]],
+            [2 * q[1], 2 * q[0], 2 * q[3], 2 * q[2]],
+            [0, -4 * q[1], -4 * q[2], 0]
         ])
         step = j.T.dot(f)
         step /= norm(step)  # normalise step magnitude
