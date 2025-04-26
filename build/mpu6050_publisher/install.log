@@ -1,6 +1,10 @@
 /home/hexapod/ros2_ws/install/mpu6050_publisher/lib/python3.10/site-packages/mpu6050_publisher/__init__.py
+/home/hexapod/ros2_ws/install/mpu6050_publisher/lib/python3.10/site-packages/mpu6050_publisher/madgwickahrs.py
+/home/hexapod/ros2_ws/install/mpu6050_publisher/lib/python3.10/site-packages/mpu6050_publisher/quaternion.py
 /home/hexapod/ros2_ws/install/mpu6050_publisher/lib/python3.10/site-packages/mpu6050_publisher/mpu6050_node.py
 /home/hexapod/ros2_ws/install/mpu6050_publisher/lib/python3.10/site-packages/mpu6050_publisher/__pycache__/__init__.cpython-310.pyc
+/home/hexapod/ros2_ws/install/mpu6050_publisher/lib/python3.10/site-packages/mpu6050_publisher/__pycache__/madgwickahrs.cpython-310.pyc
+/home/hexapod/ros2_ws/install/mpu6050_publisher/lib/python3.10/site-packages/mpu6050_publisher/__pycache__/quaternion.cpython-310.pyc
 /home/hexapod/ros2_ws/install/mpu6050_publisher/lib/python3.10/site-packages/mpu6050_publisher/__pycache__/mpu6050_node.cpython-310.pyc
 /home/hexapod/ros2_ws/install/mpu6050_publisher/share/ament_index/resource_index/packages/mpu6050_publisher
 /home/hexapod/ros2_ws/install/mpu6050_publisher/share/mpu6050_publisher/package.xml

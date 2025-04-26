@@ -59,24 +59,41 @@ pca_1.frequency = 50
 pca_2 = PCA9685(i2c, address=0x41)
 pca_2.frequency = 50
 
+# Add a dictionary to track the current angle of each servo
+current_servo_angles = {}
+
 try:
     step_size = 1       # Default step size for gradual movement (degrees)
     delay_between_steps = 0.05  # Default delay between each step (seconds)
 
     # Function to move a single servo to the target angle
     def move_servo(servo_channel, target_angle, step_size, delay_between_steps, pca, frequency):
-        for current_angle in range(MIN_ANGLE, target_angle + 1, step_size):
+        # Get the current angle of the servo, default to MIN_ANGLE if not set
+        start_angle = current_servo_angles.get(servo_channel, MIN_ANGLE)
+        step = step_size if target_angle > start_angle else -step_size
+
+        for current_angle in range(start_angle, target_angle + step, step):
             duty = angle_to_duty_cycle(current_angle, frequency)
             pca.channels[servo_channel].duty_cycle = duty
             time.sleep(delay_between_steps)
 
+        # Update the current angle of the servo
+        current_servo_angles[servo_channel] = target_angle
+
     # Function to move all servos of a leg to the target angle
     def move_leg(leg_channels, target_angle, step_size, delay_between_steps, pca, frequency):
-        for current_angle in range(MIN_ANGLE, target_angle + 1, step_size):
-            duty = angle_to_duty_cycle(current_angle, frequency)
-            for ch in leg_channels:
-                pca.channels[ch].duty_cycle = duty
-            time.sleep(delay_between_steps)
+        # Get the current angle of the leg servos, default to MIN_ANGLE if not set
+        start_angles = [current_servo_angles.get(ch, MIN_ANGLE) for ch in leg_channels]
+        steps = [step_size if target_angle > start_angle else -step_size for start_angle in start_angles]
+
+        for step_index in range(len(leg_channels)):
+            for current_angle in range(start_angles[step_index], target_angle + steps[step_index], steps[step_index]):
+                duty = angle_to_duty_cycle(current_angle, frequency)
+                pca.channels[leg_channels[step_index]].duty_cycle = duty
+                time.sleep(delay_between_steps)
+
+            # Update the current angle of the servo
+            current_servo_angles[leg_channels[step_index]] = target_angle
 
     # Function to perform a continuous sweep for a single servo
     def sweep_servo(servo_channel, step_size, delay_between_steps, pca, frequency):

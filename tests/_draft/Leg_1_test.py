@@ -5,10 +5,10 @@ from adafruit_pca9685 import PCA9685
 import pigpio
 
 # Servo channel definitions (on PCA9685)
-COXA_SERVO = 15
-FEMUR_SERVO = 14
-TIBIA_SERVO = 13
-TARSUS_SERVO = 12
+COXA_SERVO = 7
+FEMUR_SERVO = 6
+TIBIA_SERVO = 5
+TARSUS_SERVO = 4
 
 # GPIO pin definitions (Radiolink channels)
 CH1_GPIO = 17  # Gait (femur, tibia,tarsus)
@@ -70,17 +70,8 @@ ch5_reader = PWMReader(pi, CH5_GPIO)
 
 # Initialize I2C and PCA9685
 i2c = busio.I2C(SCL, SDA)
-pca = PCA9685(i2c, address=0x40)
+pca = PCA9685(i2c, address=0x41)
 pca.frequency = 50
-
-# Set servos to 0 degrees slowly
-print("Setting servos to 0° slowly over 20 seconds...")
-for deg in range(0, 1):  # already at 0, keep stable
-    duty = angle_to_duty_cycle(deg, pca.frequency)
-    for ch in [COXA_SERVO, FEMUR_SERVO, TIBIA_SERVO, TARSUS_SERVO]:
-        pca.channels[ch].duty_cycle = duty
-    time.sleep(0.1)
-time.sleep(20)
 
 print("Starting control loop...")
 gait_active = False
@@ -103,14 +94,12 @@ try:
             pca.channels[COXA_SERVO].duty_cycle = angle_to_duty_cycle(coxa_angle)
             pca.channels[FEMUR_SERVO].duty_cycle = angle_to_duty_cycle(femur_angle)
             pca.channels[TIBIA_SERVO].duty_cycle = angle_to_duty_cycle(tibia_angle)
+            pca.channels[TARSUS_SERVO].duty_cycle = angle_to_duty_cycle(tarsus_angle)
         else:
             # Hold neutral
-            for ch in [COXA_SERVO, FEMUR_SERVO, TIBIA_SERVO]:
+            for ch in [COXA_SERVO, FEMUR_SERVO, TIBIA_SERVO,TARSUS_SERVO]:
                 pca.channels[ch].duty_cycle = angle_to_duty_cycle(90)
 
-        # Tarsus is always active
-        tarsus_angle = rc_to_angle(ch2_pw)
-        pca.channels[TARSUS_SERVO].duty_cycle = angle_to_duty_cycle(tarsus_angle)
 
         time.sleep(0.02)
 

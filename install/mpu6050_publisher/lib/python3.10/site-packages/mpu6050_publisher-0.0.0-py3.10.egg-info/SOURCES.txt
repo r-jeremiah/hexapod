@@ -9,7 +9,9 @@ setup.py
 ../../build/mpu6050_publisher/mpu6050_publisher.egg-info/top_level.txt
 ../../build/mpu6050_publisher/mpu6050_publisher.egg-info/zip-safe
 mpu6050_publisher/__init__.py
+mpu6050_publisher/madgwickahrs.py
 mpu6050_publisher/mpu6050_node.py
+mpu6050_publisher/quaternion.py
 resource/mpu6050_publisher
 test/test_copyright.py
 test/test_flake8.py

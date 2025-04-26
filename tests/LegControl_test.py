@@ -141,12 +141,9 @@ def read_gait_input():
 try:
     current_tripod = 0
     print("Starting Gait Controller with 3-mode CH5 toggle...")
-    
+
     while True:
         direction, ch5 = read_gait_input()
-
-        print(f"CH5 Pulse Width: {ch5}")
-
 
         # Map CH5 (1000, 1500, 2000) to toggle modes
         if ch5 < 1200:
@@ -172,6 +169,8 @@ try:
                 raise_leg(leg_index, 10)
                 time.sleep(0.1)
                 lower_leg(leg_index)
+        
+        print(f"CH1: {pwm_values[CH1_GPIO]}, CH2: {pwm_values[CH2_GPIO]}, CH5: {pwm_values[CH5_GPIO]}")
 
         time.sleep(0.05)
 
