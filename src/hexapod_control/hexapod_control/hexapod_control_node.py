@@ -12,7 +12,7 @@ import math
 from hexapod_control.reset_gpio import reset_gpio  # Import the reset function
 
 # Constants for tripod groups
-TRIPOD_GROUPS = [[0, 3, 4], [1, 2, 5]]
+TRIPOD_GROUPS = [[0, 3, 5], [1, 2, 4]]
 
 # Constants for PWM and servo control
 CH1_GPIO = 17  # Left/right
@@ -32,12 +32,12 @@ pca_2.frequency = 50
 
 # Servo channel layout
 LEG_CHANNELS = [
-    [3, 2, 1, 0],    # Leg 1 (PCA 0x40)
-    [7, 6, 5, 4],    # Leg 2 (PCA 0x40)
-    [15, 14, 13, 12],# Leg 3 (PCA 0x40)
-    [3, 2, 1, 0],    # Leg 4 (PCA 0x41)
-    [7, 6, 5, 4],    # Leg 5 (PCA 0x41)
-    [11, 10, 9, 8],  # Leg 6 (PCA 0x41)
+    [3, 2, 1, 0],    # Leg 0
+    [7, 6, 5, 4],    # Leg 1
+    [15, 14, 13, 12],# Leg 2
+    [3, 2, 1, 0],    # Leg 3
+    [7, 6, 5, 4],    # Leg 4
+    [11, 10, 9, 8],  # Leg 5
 ]
 LEG_PCAS = [pca_1, pca_1, pca_1, pca_2, pca_2, pca_2]
 
@@ -53,9 +53,6 @@ def move_leg(leg_index, positions):
     for channel, angle in zip([coxa, femur, tibia, tarsus], angles):
         duty = angle_to_duty_cycle(angle)
         pca.channels[channel].duty_cycle = duty
-
-def raise_leg(leg_index, step, ch1_angle=90, ch2_angle=90):
-    move_leg(leg_index, (ch1_angle, 70 - step, 100 + step, ch2_angle))
 
 def move_leg_slowly(leg_index, target_positions, step_size, delay_between_steps):
     # Get the current positions of the leg (assume starting at 90 degrees for all joints)
@@ -202,7 +199,7 @@ class HexapodControlNode(Node):
                 # Manual mode logic
                 if ch5 >= 1700:  # Manual mode
                     if direction is not None:  # Only proceed if a valid direction is provided
-                        self.get_logger().info(f"[MANUAL MODE] Direction: {direction}")
+                        self.get_logger().info(f"[MANUAL MODE] Direction: {{direction_str}}")
 
                         # Calculate angles based on CH1 and CH2 inputs
                         ch1_angle = (self.pwm_values[CH1_GPIO] - 1500) / 500 * 45 + 90  # Map CH1 to angle
@@ -213,18 +210,22 @@ class HexapodControlNode(Node):
 
                         # Move Tripod Group 1 (Legs 0, 3, 4)
                         self.get_logger().info("Moving Tripod Group 1")
+                        self.get_logger().info(f"Raising legs in Tripod Group 1: {TRIPOD_GROUPS[0]}")
                         for leg_index in TRIPOD_GROUPS[0]:
-                            raise_leg(leg_index, 10 + adjustment, ch1_angle, ch2_angle)
+                            self.raise_leg(leg_index, 10 + adjustment, ch1_angle, ch2_angle)
                         time.sleep(0.1)  # Allow time for the legs to raise
                         for leg_index in TRIPOD_GROUPS[0]:
+                            self.move_leg_to_direction(leg_index, direction, adjustment)
                             self.lower_leg(leg_index, ch1_angle, ch2_angle)
 
                         # Move Tripod Group 2 (Legs 1, 2, 5)
                         self.get_logger().info("Moving Tripod Group 2")
+                        self.get_logger().info(f"Raising legs in Tripod Group 2: {TRIPOD_GROUPS[1]}")
                         for leg_index in TRIPOD_GROUPS[1]:
-                            raise_leg(leg_index, 10 + adjustment, ch1_angle, ch2_angle)
+                            self.raise_leg(leg_index, 10 + adjustment, ch1_angle, ch2_angle)
                         time.sleep(0.1)  # Allow time for the legs to raise
                         for leg_index in TRIPOD_GROUPS[1]:
+                            self.move_leg_to_direction(leg_index, direction, adjustment)
                             self.lower_leg(leg_index, ch1_angle, ch2_angle)
                     else:
                         self.get_logger().info("[MANUAL MODE] No valid direction detected. Legs remain stationary.")
@@ -251,8 +252,8 @@ class HexapodControlNode(Node):
     def initialize_legs(self):
         # Initial positions for all legs
         initial_positions = (90, 140, 90, 40)  # (coxa, femur, tibia, tarsus)
-        self.default_positions = (90, 120, 20, 150)  # Store final positions as default positions
-        step_size = 3
+        self.default_positions = (90, 120, 5, 120)  # Store final positions as default positions
+        step_size = 1
         delay_between_steps = 0.05
 
         # Move all legs to the initial position
@@ -270,13 +271,48 @@ class HexapodControlNode(Node):
             move_leg_slowly(leg_index, self.default_positions, step_size, delay_between_steps)
             self.get_logger().info(f"Leg {leg_index} moved to final positions: {self.default_positions}")
 
-    def lower_leg(self, leg_index):
+    def lower_leg(self, leg_index, ch1_angle=90, ch2_angle=90):
         """
         Lower the leg to its default position.
         :param leg_index: Index of the leg to lower.
+        :param ch1_angle: Angle for the coxa joint (default 90).
+        :param ch2_angle: Angle for the tarsus joint (default 90).
         """
-        # Use the default positions stored during initialization
         move_leg(leg_index, self.default_positions)
+
+    def raise_leg(self, leg_index, step, ch1_angle=90, ch2_angle=90):
+        """
+        Raise the leg based on channel inputs.
+        :param leg_index: Index of the leg to raise.
+        :param step: Step height for raising the leg.
+        :param ch1_angle: Angle derived from CH1 (left/right) input.
+        :param ch2_angle: Angle derived from CH2 (forward/backward) input.
+        """
+        coxa, femur, tibia, tarsus = self.default_positions
+        move_leg(leg_index, (ch1_angle, femur - step, tibia + step, ch2_angle))
+
+    def move_leg_to_direction(self, leg_index, direction, adjustment):
+        """
+        Move a leg based on the direction and stabilization adjustment.
+        :param leg_index: Index of the leg to move.
+        :param direction: Direction of movement (e.g., forward, backward, left, right).
+        :param adjustment: Stabilization adjustment based on IMU data.
+        """
+        coxa, femur, tibia, tarsus = self.default_positions
+
+        if direction == 0:  # Forward
+            move_leg(leg_index, (coxa, femur - 10, tibia + 10, tarsus))
+        elif direction == -4:  # Backward
+            move_leg(leg_index, (coxa, femur + 10, tibia - 10, tarsus))
+        elif direction == 1:  # Right
+            move_leg(leg_index, (coxa + 10, femur, tibia, tarsus))
+        elif direction == -1:  # Left
+            move_leg(leg_index, (coxa - 10, femur, tibia, tarsus))
+        else:
+            # No movement, return to default position
+            move_leg(leg_index, self.default_positions)
+
+        time.sleep(0.1)  # Allow time for the leg to move
 
 def main(args=None):
     rclpy.init(args=args)

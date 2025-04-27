@@ -4,10 +4,8 @@ from sensor_msgs.msg import Imu
 from std_msgs.msg import Header
 from mpu6050 import mpu6050
 import math
-import sys
-
-# Make sure you have madgwickahrs.py in the same folder or add the path
 from mpu6050_publisher.madgwickahrs import MadgwickAHRS
+# from hexapod_vision.i2c_bus import i2c_bus  # Commented out as it could not be resolved
 
 class MPU6050Publisher(Node):
     def __init__(self):
