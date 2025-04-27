@@ -22,4 +22,6 @@ setup(
             'amg8833_publisher = hexapod_vision.amg8833_publisher:main',
         ],
     },
+
+
 )

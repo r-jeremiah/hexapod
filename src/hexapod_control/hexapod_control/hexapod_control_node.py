@@ -2,12 +2,14 @@ import rclpy
 from rclpy.node import Node
 from std_msgs.msg import String
 from geometry_msgs.msg import Pose
-from std_srvs.srv import Trigger
+from sensor_msgs.msg import Imu
 import time
 import pigpio
 from board import SCL, SDA
 import busio
 from adafruit_pca9685 import PCA9685
+import math
+from hexapod_control.reset_gpio import reset_gpio  # Import the reset function
 
 # Constants for tripod groups
 TRIPOD_GROUPS = [[0, 3, 4], [1, 2, 5]]
@@ -52,11 +54,28 @@ def move_leg(leg_index, positions):
         duty = angle_to_duty_cycle(angle)
         pca.channels[channel].duty_cycle = duty
 
-def raise_leg(leg_index, step):
-    move_leg(leg_index, (90, 70 - step, 100 + step, 90))
+def raise_leg(leg_index, step, ch1_angle=90, ch2_angle=90):
+    move_leg(leg_index, (ch1_angle, 70 - step, 100 + step, ch2_angle))
 
-def lower_leg(leg_index):
-    move_leg(leg_index, (90, 90, 90, 90))
+def move_leg_slowly(leg_index, target_positions, step_size, delay_between_steps):
+    # Get the current positions of the leg (assume starting at 90 degrees for all joints)
+    current_positions = [90, 130, 90, 40]  # Default starting positions matching the initialize position
+    coxa, femur, tibia, tarsus = LEG_CHANNELS[leg_index]
+
+    # Gradually move each joint to the target position
+    for i, (current, target) in enumerate(zip(current_positions, target_positions)):
+        while current != target:
+            if current < target:
+                current = min(current + step_size, target)
+            elif current > target:
+                current = max(current - step_size, target)
+
+            # Update the joint position
+            duty = angle_to_duty_cycle(current)
+            LEG_PCAS[leg_index].channels[LEG_CHANNELS[leg_index][i]].duty_cycle = duty
+
+            # Delay between steps
+            time.sleep(delay_between_steps)
 
 class HexapodControlNode(Node):
     def __init__(self):
@@ -83,17 +102,53 @@ class HexapodControlNode(Node):
         self.pi.callback(CH2_GPIO, pigpio.EITHER_EDGE, self.create_pwm_callback(CH2_GPIO))
         self.pi.callback(CH5_GPIO, pigpio.EITHER_EDGE, self.create_pwm_callback(CH5_GPIO))
 
-        self.get_logger().info('Hexapod Control Node initialized in manual mode.')
+        # Subscribe to IMU data for stabilization
+        self.subscription = self.create_subscription(
+            Imu,
+            'imu/data_raw',
+            self.imu_callback,
+            10
+        )
+
+        # Stabilization variables
+        self.roll = 0.0
+        self.pitch = 0.0
+
+        self.get_logger().info('Hexapod Control Node initialized with stabilization.')
+
+    class PWMCallback:
+        def __init__(self, gpio, pwm_values):
+            self.gpio = gpio
+            self.pwm_values = pwm_values
+            self.start_tick = 0
+
+        def __call__(self, gpio, level, tick):
+            if level == 1:
+                self.start_tick = tick
+            elif level == 0:
+                pulse = pigpio.tickDiff(self.start_tick, tick)
+                self.pwm_values[self.gpio] = pulse
 
     def create_pwm_callback(self, gpio):
-        def cbf(gpio, level, tick):
-            if level == 1:
-                cbf.start_tick = tick
-            elif level == 0:
-                pulse = pigpio.tickDiff(cbf.start_tick, tick)
-                self.pwm_values[gpio] = pulse
-        cbf.start_tick = 0
-        return cbf
+        return self.PWMCallback(gpio, self.pwm_values)
+
+    def imu_callback(self, msg):
+        # Extract roll and pitch from the IMU quaternion
+        q = msg.orientation
+        self.roll, self.pitch = self.quaternion_to_euler(q.w, q.x, q.y, q.z)
+
+    def quaternion_to_euler(self, w, x, y, z):
+        # Convert quaternion to roll, pitch, and yaw
+        t0 = +2.0 * (w * x + y * z)
+        t1 = +1.0 - 2.0 * (x * x + y * y)
+        roll = math.atan2(t0, t1)
+
+        t2 = +2.0 * (w * y - z * x)
+        t2 = +1.0 if t2 > +1.0 else t2
+        t2 = -1.0 if t2 < -1.0 else t2
+        pitch = math.asin(t2)
+
+        return roll, pitch
 
     def read_gait_input(self):
         ch1 = self.pwm_values[CH1_GPIO]
@@ -146,11 +201,33 @@ class HexapodControlNode(Node):
 
                 # Manual mode logic
                 if ch5 >= 1700:  # Manual mode
-                    self.get_logger().info(f"[MANUAL MODE] Direction: {direction}")
-                    for leg_index in range(6):
-                        raise_leg(leg_index, 10)
-                        time.sleep(0.1)
-                        lower_leg(leg_index)
+                    if direction is not None:  # Only proceed if a valid direction is provided
+                        self.get_logger().info(f"[MANUAL MODE] Direction: {direction}")
+
+                        # Calculate angles based on CH1 and CH2 inputs
+                        ch1_angle = (self.pwm_values[CH1_GPIO] - 1500) / 500 * 45 + 90  # Map CH1 to angle
+                        ch2_angle = (self.pwm_values[CH2_GPIO] - 1500) / 500 * 45 + 90  # Map CH2 to angle
+
+                        # Apply stabilization adjustments
+                        adjustment = self.calculate_stabilization_adjustment()
+
+                        # Move Tripod Group 1 (Legs 0, 3, 4)
+                        self.get_logger().info("Moving Tripod Group 1")
+                        for leg_index in TRIPOD_GROUPS[0]:
+                            raise_leg(leg_index, 10 + adjustment, ch1_angle, ch2_angle)
+                        time.sleep(0.1)  # Allow time for the legs to raise
+                        for leg_index in TRIPOD_GROUPS[0]:
+                            self.lower_leg(leg_index, ch1_angle, ch2_angle)
+
+                        # Move Tripod Group 2 (Legs 1, 2, 5)
+                        self.get_logger().info("Moving Tripod Group 2")
+                        for leg_index in TRIPOD_GROUPS[1]:
+                            raise_leg(leg_index, 10 + adjustment, ch1_angle, ch2_angle)
+                        time.sleep(0.1)  # Allow time for the legs to raise
+                        for leg_index in TRIPOD_GROUPS[1]:
+                            self.lower_leg(leg_index, ch1_angle, ch2_angle)
+                    else:
+                        self.get_logger().info("[MANUAL MODE] No valid direction detected. Legs remain stationary.")
 
                 time.sleep(0.05)
         except KeyboardInterrupt:
@@ -158,14 +235,58 @@ class HexapodControlNode(Node):
         finally:
             self.cleanup()
 
+    def calculate_stabilization_adjustment(self):
+        # Calculate stabilization adjustment based on pitch
+        if abs(math.degrees(self.pitch)) > 45:
+            return 10 if self.pitch > 0 else -10
+        return 0
+
     def cleanup(self):
         self.pi.stop()
         pca_1.deinit()
         pca_2.deinit()
+        reset_gpio.reset_pin()
+        reset_gpio.reset_pca()
+
+    def initialize_legs(self):
+        # Initial positions for all legs
+        initial_positions = (90, 140, 90, 40)  # (coxa, femur, tibia, tarsus)
+        self.default_positions = (90, 120, 20, 150)  # Store final positions as default positions
+        step_size = 3
+        delay_between_steps = 0.05
+
+        # Move all legs to the initial position
+        self.get_logger().info("Moving all legs to the initial position...")
+        for leg_index in range(6):
+            move_leg_slowly(leg_index, initial_positions, step_size, delay_between_steps)
+            self.get_logger().info(f"Leg {leg_index} moved to initial positions: {initial_positions}")
+
+        # Wait for 10 seconds
+        time.sleep(10)
+
+        # Move all legs to the final position
+        self.get_logger().info("Moving all legs to the final position...")
+        for leg_index in range(6):
+            move_leg_slowly(leg_index, self.default_positions, step_size, delay_between_steps)
+            self.get_logger().info(f"Leg {leg_index} moved to final positions: {self.default_positions}")
+
+    def lower_leg(self, leg_index):
+        """
+        Lower the leg to its default position.
+        :param leg_index: Index of the leg to lower.
+        """
+        # Use the default positions stored during initialization
+        move_leg(leg_index, self.default_positions)
 
 def main(args=None):
     rclpy.init(args=args)
     node = HexapodControlNode()
+
+    # Initialize legs
+    node.initialize_legs()
+
+    # Run manual mode
     node.run_manual_mode()
+
     node.destroy_node()
     rclpy.shutdown()

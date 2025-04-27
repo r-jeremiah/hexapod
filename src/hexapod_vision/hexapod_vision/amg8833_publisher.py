@@ -5,9 +5,8 @@ from std_msgs.msg import Header
 import numpy as np
 import cv2
 from cv_bridge import CvBridge
-import board
-import busio
 import adafruit_amg88xx
+from hexapod_vision.i2c_bus import i2c_bus  # Import the shared I2C bus
 
 class AMG8833Publisher(Node):
     def __init__(self):
@@ -15,7 +14,7 @@ class AMG8833Publisher(Node):
         self.publisher_ = self.create_publisher(Image, 'thermal_image', 10)
         self.bridge = CvBridge()
 
-        i2c_bus = busio.I2C(board.SCL, board.SDA)
+        # Use the shared I2C bus
         self.sensor = adafruit_amg88xx.AMG88XX(i2c_bus)
 
         self.timer = self.create_timer(0.2, self.publish_image)  # 5 Hz
