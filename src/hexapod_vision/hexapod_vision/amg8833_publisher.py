@@ -5,8 +5,9 @@ from std_msgs.msg import Header
 import numpy as np
 import cv2
 from cv_bridge import CvBridge
+import board
+import busio
 import adafruit_amg88xx
-from hexapod_vision.i2c_bus import i2c_bus  # Import the shared I2C bus
 
 class AMG8833Publisher(Node):
     def __init__(self):
@@ -14,7 +15,7 @@ class AMG8833Publisher(Node):
         self.publisher_ = self.create_publisher(Image, 'thermal_image', 10)
         self.bridge = CvBridge()
 
-        # Use the shared I2C bus
+        i2c_bus = busio.I2C(board.SCL, board.SDA)
         self.sensor = adafruit_amg88xx.AMG88XX(i2c_bus)
 
         self.timer = self.create_timer(0.2, self.publish_image)  # 5 Hz
@@ -25,28 +26,11 @@ class AMG8833Publisher(Node):
         # Resize the image to 720x720 for better resolution
         resized = cv2.resize(pixels, (720, 720), interpolation=cv2.INTER_CUBIC)
 
-        # Apply CLAHE for contrast enhancement
-        clahe = cv2.createCLAHE(clipLimit=4.0, tileGridSize=(8, 8))
-        enhanced = clahe.apply(np.uint8(resized))
-
-        # Apply Gaussian Blur for noise reduction
-        blurred = cv2.GaussianBlur(enhanced, (5, 5), 0)
-
-        # Optionally, apply Canny Edge Detection to highlight edges
-        edges = cv2.Canny(blurred, 100, 200)
-
-        # Apply adaptive thresholding
-        adaptive_thresholded = cv2.adaptiveThreshold(
-            blurred, 
-            255, 
-            cv2.ADAPTIVE_THRESH_GAUSSIAN_C, 
-            cv2.THRESH_BINARY, 
-            11,  # Block size (odd number)
-            2    # Constant subtracted from the mean
-        )
+        # Flip the image vertically
+        flipped = cv2.flip(resized, 0)
 
         # Normalize the image for display purposes
-        normalized = cv2.normalize(resized, None, 0, 255, cv2.NORM_MINMAX)
+        normalized = cv2.normalize(flipped, None, 0, 255, cv2.NORM_MINMAX)
         
         image = np.uint8(normalized)
 
