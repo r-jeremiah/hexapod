@@ -12,7 +12,7 @@ from hexapod_control.reset_gpio import reset_gpio  # Import the reset function
 import threading
 
 # Constants for tripod groups
-TRIPOD_GROUPS = [[0, 2, 4], [1, 3, 5]]
+TRIPOD_GROUPS = [[0, 2, 5], [1, 3, 4]]
 
 # Constants for PWM and servo control
 CH1_GPIO = 17  # Left/right
@@ -210,9 +210,9 @@ class HexapodControlNode(Node):
                         self.is_moving = False  # Reset the flag after movement
                     else:
                         # self.get_logger().info("[MANUAL MODE] No valid direction detected. Holding legs in default positions.")
-                        # for leg_index in range(6):
-                        #     move_leg(leg_index, self.default_positions)
-                        self.hold_default_positions()
+                        for leg_index in range(6):
+                            move_leg(leg_index, self.default_positions)
+                        # self.hold_default_positions()
 
                 time.sleep(0.05)
 
@@ -230,8 +230,8 @@ class HexapodControlNode(Node):
 
     def initialize_legs(self):
         # Initial positions for all legs
-        initial_positions = (90, 140, 110, 60)  # (coxa, femur, tibia, tarsus)
-        self.default_positions = (90, 105, 10, 80)  # Store final positions as default positions
+        initial_positions = (90, 140, 110, 55)  # (coxa, femur, tibia, tarsus)
+        self.default_positions = (90, 105, 10, 85)  # Store final positions as default positions
         # Adjust step_size and delay_between_steps to control speed and smoothness
         step_size = 3  # Decrease step size for smoother movement, increase for faster movement
         delay_between_steps = 0.1 # Increase delay for smoother movement, decrease for faster movement
@@ -263,27 +263,27 @@ class HexapodControlNode(Node):
         coxa, femur, tibia, tarsus = self.default_positions
 
         if direction == 0:  # Forward
-            move_leg(leg_index, (coxa +1, femur - 45, tibia + 35, tarsus +1))
+            move_leg(leg_index, (coxa +1, femur - 25, tibia + 35, tarsus + 10))
         elif direction == -4:  # Backward
-            move_leg(leg_index, (coxa +1, femur + 45, tibia - 35, tarsus +1))
+            move_leg(leg_index, (coxa +1, femur + 25, tibia - 35, tarsus +10))
         elif direction == 1:  # Right
-            move_leg(leg_index, (coxa + 30, femur - 30, tibia + 20, tarsus +1))
+            move_leg(leg_index, (coxa + 30, femur - 25, tibia + 20, tarsus +10))
         elif direction == -1:  # Left
-            move_leg(leg_index, (coxa - 30, femur + 30, tibia - 20, tarsus +1))
+            move_leg(leg_index, (coxa - 30, femur + 25, tibia - 20, tarsus +10))
         elif direction == 2:  # Forward + Right
-            move_leg(leg_index, (coxa + 15, femur - 45, tibia + 35, tarsus +1))
+            move_leg(leg_index, (coxa + 15, femur - 25, tibia + 35, tarsus +10))
         elif direction == -2:  # Forward + Left
-            move_leg(leg_index, (coxa - 15, femur - 45, tibia + 35, tarsus +1))
+            move_leg(leg_index, (coxa - 15, femur - 25, tibia + 35, tarsus +10))
         elif direction == 3:  # Backward + Right
-            move_leg(leg_index, (coxa + 15, femur + 45, tibia - 35, tarsus +1))
+            move_leg(leg_index, (coxa + 15, femur + 25, tibia - 35, tarsus +10))
         elif direction == -3:  # Backward + Left
-            move_leg(leg_index, (coxa - 15, femur + 45, tibia - 35, tarsus +1))
+            move_leg(leg_index, (coxa - 15, femur + 25, tibia - 35, tarsus +10))
         else:
             # No movement, ensure the leg holds its default position
             self.get_logger().info(f"Leg {leg_index} holding default position: {self.default_positions}")
             move_leg(leg_index, self.default_positions)
 
-        time.sleep(0.2)  # Increase delay to make movement slower
+        time.sleep(0.05)  # Increase delay to make movement slower
 
     def hold_default_positions(self):
         """Continuously send default positions to all legs to hold their positions."""
