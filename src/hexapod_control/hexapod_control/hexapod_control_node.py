@@ -175,44 +175,112 @@ class HexapodControlNode(Node):
     def run_manual_mode(self):
         try:
             while rclpy.ok():
+                # Read direction and CH5 input
                 direction, ch5 = self.read_gait_input()
 
-                # Manual mode logic
-                if ch5 >= 1700:  # Manual mode
-                    if direction is not None:  # Only proceed if a valid direction is provided
-                        self.is_moving = True  # Indicate that the hexapod is moving
-                        self.get_logger().info(f"[MANUAL MODE] Direction: {direction}")
+                # Determine the gait based on CH5 value
+                if ch5 >= 1700 and ch5 < 1900:  # Ripple Gait
+                    gait = "ripple"
+                    gait_sequence = [[3], [2], [1], [4], [5], [6]]
+                elif ch5 >= 1900 and ch5 < 2100:  # Wave Gait
+                    gait = "wave"
+                    gait_sequence = [[2], [3, 6], [4, 1], [5]]
+                elif ch5 >= 2100:  # Tripod Gait
+                    gait = "tripod"
+                    gait_sequence = [[3, 6], [2, 5], [4, 1]]
+                else:
+                    gait = None
+                    gait_sequence = []
 
-                        # Move Tripod Group 1 (Legs 0, 3, 4)
-                        self.get_logger().info("Moving Tripod Group 1")
-                        for leg_index in TRIPOD_GROUPS[0]:
+                if gait and direction is not None:  # Only proceed if a valid gait and direction are provided
+                    self.is_moving = True  # Indicate that the hexapod is moving
+                    self.get_logger().info(f"[MANUAL MODE] Gait: {gait}, Direction: {direction}")
+
+                    # Define custom angles for each direction and leg
+                    custom_angles = {
+                        0: {  # Forward
+                            0: (10, 45, 35, 10),  # Leg 1
+                            1: (10, 45, 35, 10),  # Leg 2
+                            2: (10, 45, 35, 10),  # Leg 3
+                            3: (-10, 45, 35, 10),  # Leg 4
+                            4: (-10, 45, 35, 10),  # Leg 5
+                            5: (-10, 45, 35, 10),  # Leg 6
+                        },
+                        -4: {  # Backward
+                            0: (-10, 45, 35, 10),  # Leg 1
+                            1: (-10, 45, 35, 10),  # Leg 2
+                            2: (-10, 45, 35, 10),  # Leg 3
+                            3: (10, 45, 35, 10),  # Leg 4
+                            4: (10, 45, 35, 10),  # Leg 5
+                            5: (10, 45, 35, 10),  # Leg 6
+                        },
+                        1: {  # Right
+                            0: (25, 45, 35, 10),  # Leg 1
+                            1: (25, 45, 35, 10),  # Leg 2
+                            2: (25, 45, 35, 10),  # Leg 3
+                            3: (25, 45, 35, 10),  # Leg 4
+                            4: (25, 45, 35, 10),  # Leg 5
+                            5: (25, 45, 35, 10),  # Leg 6
+                        },
+                        -1: {  # Left
+                            0: (-25, 45, 35, 10),  # Leg 1
+                            1: (-25, 45, 35, 10),  # Leg 2
+                            2: (-25, 45, 35, 10),  # Leg 3
+                            3: (-25, 45, 35, 10),  # Leg 4
+                            4: (-25, 45, 35, 10),  # Leg 5
+                            5: (-25, 45, 35, 10),  # Leg 6
+                        },
+                        2: {  # Forward + Right
+                            0: (15, 45, 35, 10),  # Leg 1
+                            1: (15, 45, 35, 10),  # Leg 2
+                            2: (15, 45, 35, 10),  # Leg 3
+                            3: (-5, 45, 35, 10),  # Leg 4
+                            4: (-5, 45, 35, 10),  # Leg 5
+                            5: (-5, 45, 35, 10),  # Leg 6
+                        },
+                        -2: {  # Forward + Left
+                            0: (-5, 45, 35, 10),  # Leg 1
+                            1: (-5, 45, 35, 10),  # Leg 2
+                            2: (-5, 45, 35, 10),  # Leg 3
+                            3: (-15, 45, 35, 10),  # Leg 4
+                            4: (-15, 45, 35, 10),  # Leg 5
+                            5: (-15, 45, 35, 10),  # Leg 6
+                        },
+                        3: {  # Backward + Right
+                            0: (5, 45, 35, 10),  # Leg 1
+                            1: (5, 45, 35, 10),  # Leg 2
+                            2: (5, 45, 35, 10),  # Leg 3
+                            3: (15, 45, 35, 10),  # Leg 4
+                            4: (15, 45, 35, 10),  # Leg 5
+                            5: (15, 45, 35, 10),  # Leg 6
+                        },
+                        -3: {  # Backward + Left
+                            0: (-15, 45, 35, 10),  # Leg 1
+                            1: (-15, 45, 35, 10),  # Leg 2
+                            2: (-15, 45, 35, 10),  # Leg 3
+                            3: (-5, 45, 35, 10),  # Leg 4
+                            4: (-5, 45, 35, 10),  # Leg 5
+                            5: (-5, 45, 35, 10),  # Leg 6
+                        },
+                    }
+
+                    # Execute the gait sequence
+                    for step in gait_sequence:
+                        self.get_logger().info(f"Executing step: {step}")
+                        for leg_index in step:
                             self.raise_leg(leg_index, 10)
                         time.sleep(0.1)
 
-                        for leg_index in TRIPOD_GROUPS[0]:
-                            self.move_leg_to_direction(leg_index, direction)
+                        for leg_index in step:
+                            self.move_leg_to_direction(leg_index, direction, custom_angles)
 
-                        for leg_index in TRIPOD_GROUPS[0]:
+                        for leg_index in step:
                             self.lower_leg(leg_index)
 
-                        # Move Tripod Group 2 (Legs 1, 2, 5)
-                        self.get_logger().info("Moving Tripod Group 2")
-                        for leg_index in TRIPOD_GROUPS[1]:
-                            self.raise_leg(leg_index, 10)
-                        time.sleep(0.1)
-
-                        for leg_index in TRIPOD_GROUPS[1]:
-                            self.move_leg_to_direction(leg_index, direction)
-
-                        for leg_index in TRIPOD_GROUPS[1]:
-                            self.lower_leg(leg_index)
-
-                        self.is_moving = False  # Reset the flag after movement
-                    else:
-                        # self.get_logger().info("[MANUAL MODE] No valid direction detected. Holding legs in default positions.")
-                        # for leg_index in range(6):
-                        #     move_leg(leg_index, self.default_positions)
-                        self.hold_default_positions()
+                    self.is_moving = False  # Reset the flag after movement
+                else:
+                    # Hold default positions if no valid gait or direction
+                    self.hold_default_positions()
 
                 time.sleep(0.05)
 
@@ -259,31 +327,40 @@ class HexapodControlNode(Node):
         coxa, femur, tibia, tarsus = self.default_positions
         move_leg(leg_index, (coxa, femur - step, tibia + step, tarsus))
 
-    def move_leg_to_direction(self, leg_index, direction):
-        coxa, femur, tibia, tarsus = self.default_positions
+    def move_leg_to_direction(self, leg_index, direction, custom_angles=None, sequence=None):
+        """
+        Moves a leg in the specified direction using custom angles and a movement sequence.
+        :param leg_index: Index of the leg to move.
+        :param direction: Direction to move the leg (e.g., forward, backward, etc.).
+        :param custom_angles: Dictionary of custom angles for each leg and direction.
+        :param sequence: List defining the order of joint movements (e.g., ["femur", "tibia", "tarsus", "coxa"]).
+        """
+        # Default to the leg's default positions if no custom angles are provided
+        angles = self.default_positions
 
-        if direction == 0:  # Forward
-            move_leg(leg_index, (coxa +1, femur - 45, tibia + 35, tarsus +1))
-        elif direction == -4:  # Backward
-            move_leg(leg_index, (coxa +1, femur + 45, tibia - 35, tarsus +1))
-        elif direction == 1:  # Right
-            move_leg(leg_index, (coxa + 30, femur - 30, tibia + 20, tarsus +1))
-        elif direction == -1:  # Left
-            move_leg(leg_index, (coxa - 30, femur + 30, tibia - 20, tarsus +1))
-        elif direction == 2:  # Forward + Right
-            move_leg(leg_index, (coxa + 15, femur - 45, tibia + 35, tarsus +1))
-        elif direction == -2:  # Forward + Left
-            move_leg(leg_index, (coxa - 15, femur - 45, tibia + 35, tarsus +1))
-        elif direction == 3:  # Backward + Right
-            move_leg(leg_index, (coxa + 15, femur + 45, tibia - 35, tarsus +1))
-        elif direction == -3:  # Backward + Left
-            move_leg(leg_index, (coxa - 15, femur + 45, tibia - 35, tarsus +1))
-        else:
-            # No movement, ensure the leg holds its default position
-            self.get_logger().info(f"Leg {leg_index} holding default position: {self.default_positions}")
-            move_leg(leg_index, self.default_positions)
+        # Use custom angles for the specified direction and leg, if provided
+        if custom_angles and direction in custom_angles and leg_index in custom_angles[direction]:
+            angles = custom_angles[direction][leg_index]
 
-        time.sleep(0.2)  # Increase delay to make movement slower
+        # Define the default movement sequence if none is provided
+        if sequence is None:
+            sequence = ["femur", "tibia", "tarsus", "coxa"]  # Updated sequence
+
+        # Map the sequence to the leg's channels
+        joint_map = {
+            "coxa": 0,
+            "femur": 1,
+            "tibia": 2,
+            "tarsus": 3
+        }
+
+        # Move each joint in the specified sequence
+        for joint in sequence:
+            joint_index = joint_map[joint]
+            target_angle = angles[joint_index]
+            duty = angle_to_duty_cycle(target_angle)
+            LEG_PCAS[leg_index].channels[LEG_CHANNELS[leg_index][joint_index]].duty_cycle = duty
+            time.sleep(0.05)  # Add a small delay between joint movements for smoother motion
 
     def hold_default_positions(self):
         """Continuously send default positions to all legs to hold their positions."""
