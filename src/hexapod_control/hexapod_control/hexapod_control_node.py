@@ -9,7 +9,7 @@ import busio
 from adafruit_pca9685 import PCA9685
 import math
 from hexapod_control.reset_gpio import reset_gpio  # Import the reset function
-import threading
+from hexapod_control.hexapod_stabilizer_node import HexapodStabilizerNode
 
 # Constants for PWM and servo control
 CH1_GPIO = 17  # Left/right
@@ -107,6 +107,9 @@ def move_leg_slowly(leg_index, current_positions, target_positions, step_size=5,
 class HexapodControlNode(Node):
     def __init__(self):
         super().__init__('hexapod_control_node')
+
+        # Initialize the stabilizer
+        self.stabilizer = HexapodStabilizerNode()
 
         # Initialize pigpio for PWM input
         self.pi = pigpio.pi()
@@ -473,17 +476,18 @@ class HexapodControlNode(Node):
             if any(value != 1500 for value in self.pwm_values.values()):
                 return  # Exit if PWM indicates movement
 
+            # Use the stabilizer to adjust leg positions for stability
+            stabilized_positions = self.stabilizer.calculate_stable_positions(self.last_positions)
+
             for leg_index in range(6):  # Iterate through all legs
                 try:
                     # Only send positions if they have changed
-                    if self.last_positions[leg_index] != self.default_positions:
-                        self.get_logger().debug(f"Holding default positions for leg {leg_index}: {self.default_positions}")
-                        move_leg(leg_index, self.default_positions)
-                        self.last_positions[leg_index] = self.default_positions
+                    if self.last_positions[leg_index] != stabilized_positions[leg_index]:
+                        self.get_logger().debug(f"Holding stabilized positions for leg {leg_index}: {stabilized_positions[leg_index]}")
+                        move_leg(leg_index, stabilized_positions[leg_index])
+                        self.last_positions[leg_index] = stabilized_positions[leg_index]
                 except Exception as e:
-                    self.get_logger().warn(f"Failed to hold default positions for leg {leg_index}: {e}")
-                except Exception as e:
-                    self.get_logger().warn(f"Failed to move leg {leg_index}: {e}")
+                    self.get_logger().warn(f"Failed to hold stabilized positions for leg {leg_index}: {e}")
 
     def execute_gait_step(self):
         """Execute one step of the gait sequence."""
@@ -500,11 +504,10 @@ class HexapodControlNode(Node):
 
             # Advance to the next step in the gait sequence
             self.current_step = self.gait_controller.step()
-
 def main(args=None):
     rclpy.init(args=args)
     node = HexapodControlNode()
-
+    
     try:
         # Initialize legs
         node.initialize_legs()
