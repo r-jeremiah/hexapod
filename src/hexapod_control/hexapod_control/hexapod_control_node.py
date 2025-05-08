@@ -55,12 +55,15 @@ def angle_to_duty_cycle(angle, freq=60):
     return int(duty_cycle)
 
 def move_leg(leg_index, positions):
-    pca = LEG_PCAS[leg_index]
-    coxa, femur, tibia, tarsus = LEG_CHANNELS[leg_index]
-    angles = positions  # (coxa, femur, tibia, tarsus)
-    for channel, angle in zip([coxa, femur, tibia, tarsus], angles):
-        duty = angle_to_duty_cycle(angle)
-        pca.channels[channel].duty_cycle = duty
+    try:
+        pca = LEG_PCAS[leg_index]
+        coxa, femur, tibia, tarsus = LEG_CHANNELS[leg_index]
+        for channel, angle in zip([coxa, femur, tibia, tarsus], positions):
+            duty = angle_to_duty_cycle(angle)
+            pca.channels[channel].duty_cycle = duty
+    except Exception as e:
+        self.get_logger().error(f"I²C error on leg {leg_index}: {e}")
+        self.reinitialize_pca()
 
 def move_leg_slowly(leg_index, current_positions, target_positions, step_size, delay_between_steps):
     # Gradually move each joint to the target position
@@ -108,9 +111,15 @@ class HexapodControlNode(Node):
         # Initialize the movement flag
         self.is_moving = False
 
-        # Start a thread to continuously hold default positions
-        self.holding_thread = threading.Thread(target=self.hold_default_positions, daemon=True)
-        self.holding_thread.start()
+        # Add a dictionary to track the last sent positions
+        self.last_positions = {leg_index: None for leg_index in range(6)}
+
+        # Replace threading with a ROS timer
+        self.create_timer(0.02, self.hold_default_positions)
+
+        # Add a timer for gait execution
+        self.gait_timer = self.create_timer(0.1, self.execute_gait_step)
+        self.current_step = None
 
     class PWMCallback:
         def __init__(self, gpio, pwm_values):
@@ -194,7 +203,7 @@ class HexapodControlNode(Node):
 
                 if gait and direction is not None:  # Only proceed if a valid gait and direction are provided
                     self.is_moving = True  # Indicate that the hexapod is moving
-                    self.get_logger().info(f"[MANUAL MODE] Gait: {gait}, Direction: {direction}")
+                    self.get_logger().info(f"Gait: {gait}, Direction: {direction}")
 
                     # Define custom angles for each direction and leg
                     custom_angles = {
@@ -301,7 +310,7 @@ class HexapodControlNode(Node):
         initial_positions = (90, 140, 110, 55)  # (coxa, femur, tibia, tarsus)
         self.default_positions = (90, 105, 10, 85)  # Store final positions as default positions
         # Adjust step_size and delay_between_steps to control speed and smoothness
-        step_size = 3  # Decrease step size for smoother movement, increase for faster movement
+        step_size = 3.5  # Decrease step size for smoother movement, increase for faster movement
         delay_between_steps = 0.1 # Increase delay for smoother movement, decrease for faster movement
 
         # Move all legs to the initial position
@@ -364,19 +373,31 @@ class HexapodControlNode(Node):
 
     def hold_default_positions(self):
         """Continuously send default positions to all legs to hold their positions."""
-        while rclpy.ok():  # Run as long as ROS is active
-            if not self.is_moving:  # Only hold positions if not moving
-                for leg_index in range(6):  # Iterate through all legs
-                    pca = LEG_PCAS[leg_index]
-                    coxa, femur, tibia, tarsus = LEG_CHANNELS[leg_index]
-
-                    # Check if all channels for the leg are active
-                    if all(pca.channels[channel].duty_cycle != 0 for channel in [coxa, femur, tibia, tarsus]):
+        if not self.is_moving:  # Only hold positions if not moving
+            for leg_index in range(6):  # Iterate through all legs
+                try:
+                    # Only send positions if they have changed
+                    if self.last_positions[leg_index] != self.default_positions:
                         move_leg(leg_index, self.default_positions)
-                    else:
-                        self.get_logger().warn(f"Leg {leg_index} has inactive PWM channels. Skipping.")
+                        self.last_positions[leg_index] = self.default_positions
+                except Exception as e:
+                    self.get_logger().warn(f"Failed to move leg {leg_index}: {e}")
 
-                time.sleep(0.02)  # Reduce delay for faster updates
+    def execute_gait_step(self):
+        """Execute one step of the gait sequence."""
+        if self.is_moving and self.current_step is not None:
+            for leg_index in self.current_step:
+                self.raise_leg(leg_index, 10)
+            time.sleep(0.1)
+
+            for leg_index in self.current_step:
+                self.move_leg_to_direction(leg_index, self.direction, self.custom_angles)
+
+            for leg_index in self.current_step:
+                self.lower_leg(leg_index)
+
+            # Advance to the next step in the gait sequence
+            self.current_step = self.gait_controller.step()
 
 def main(args=None):
     rclpy.init(args=args)
