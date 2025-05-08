@@ -213,8 +213,7 @@ class HexapodControlNode(Node):
        
         # Define step_size and delay_between_steps for manual mode
         step_size = 5  # Define a step size for raising the leg
-        delay_between_steps = 0.02  # Faster delay for quicker response in manual mode
-        delay_between_steps_execution = 0.05
+        delay_between_steps = 0.01  # Faster delay for quicker response in manual mode
         direction, ch5 = self.read_gait_input()
 
         # Determine the gait based on CH5 value
@@ -369,8 +368,6 @@ class HexapodControlNode(Node):
                 for leg_index in step:
                     self.lower_leg(leg_index, step=step_size, delay=delay_between_steps)
                 time.sleep(delay_between_steps)
-                    
-                
 
             self.is_moving = False  # Reset the flag after movement
         else:
@@ -378,11 +375,6 @@ class HexapodControlNode(Node):
             self.hold_default_positions()
 
         time.sleep(0.05)
-
-        # except KeyboardInterrupt:
-        #     self.get_logger().info("Manual mode stopped by user.")
-        # finally:
-        #     self.cleanup()
 
     def cleanup(self):
         self.get_logger().info("Cleaning up resources...")
