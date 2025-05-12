@@ -135,7 +135,7 @@ class HexapodControlNode(Node):
         self.is_moving = False
 
         # Add a dictionary to track the last sent positions
-        self.default_positions = (90, 110, 12, 85)  # Default positions for all legs
+        self.default_positions = (90, 110, 10, 85)  # Default positions for all legs
         self.last_positions = {leg_index: self.default_positions for leg_index in range(6)}  # Initialize with default positions
 
         # Replace threading with a ROS timer
@@ -257,9 +257,9 @@ class HexapodControlNode(Node):
         elif ch5 >= 1600:  # Tripod Gait
             gait = "tripod"
             if direction == 0:  # Forward
-                gait_sequence = [[0, 3, 5], [1, 2, 4]]
+                gait_sequence = [[0, 2, 4], [1, 3, 5]]
             elif direction == -4:  # Backward
-                gait_sequence = [[1, 2, 4], [0, 3, 5]]
+                gait_sequence = [[1, 3, 5], [0, 2, 4]]
             elif direction == 1:  # Right
                 gait_sequence = [[0, 2, 4], [1, 3, 5]]
             elif direction == -1:  # Left
@@ -414,7 +414,7 @@ class HexapodControlNode(Node):
     def initialize_legs(self):
         # Initial positions for all legs
         initial_positions = (90, 140, 110, 55)  # (coxa, femur, tibia, tarsus)
-        self.default_positions = (90, 110, 12, 85)  # Store final positions as default positions
+        self.default_positions = (90, 110, 10, 85)  # Store final positions as default positions
         # Adjust step_size and delay_between_steps to control speed and smoothness
         step_size = 4  # Decrease step size for smoother movement, increase for faster movement
         delay_between_steps = 0.05 # Increase delay for smoother movement, decrease for faster movement
