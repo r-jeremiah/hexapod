@@ -135,7 +135,7 @@ class HexapodControlNode(Node):
         self.is_moving = False
 
         # Add a dictionary to track the last sent positions
-        self.default_positions = (90, 105, 10, 85)  # Default positions for all legs
+        self.default_positions = (90, 110, 12, 85)  # Default positions for all legs
         self.last_positions = {leg_index: self.default_positions for leg_index in range(6)}  # Initialize with default positions
 
         # Replace threading with a ROS timer
@@ -212,9 +212,8 @@ class HexapodControlNode(Node):
         """Run manual mode logic periodically."""
        
         # Define step_size and delay_between_steps for manual mode
-        step_size = 5  # Define a step size for raising the leg
+        step_size = 13  # Define a step size for raising the leg
         delay_between_steps = 0.02  # Faster delay for quicker response in manual mode
-        delay_between_steps_execution = 0.05
         direction, ch5 = self.read_gait_input()
 
         # Determine the gait based on CH5 value
@@ -280,68 +279,68 @@ class HexapodControlNode(Node):
         # Define custom angles for each direction and leg
         custom_angle_offsets = {
             0: {  # Forward
-                0: (-10, 45, 35, 10),  # Leg 1
-                1: (-10, 45, 35, 10),  # Leg 2
-                2: (-10, 45, 35, 10),  # Leg 3
-                3: (10, 45, 35, 10),  # Leg 4
-                4: (10, 45, 35, 10),  # Leg 5
-                5: (10, 45, 35, 10),  # Leg 6
+                0: (-15, 10, 35, 10),  # Leg 1
+                1: (-15, 10, 35, 10),  # Leg 2
+                2: (-15, 10, 35, 10),  # Leg 3
+                3: (15, 10, 35, 10),  # Leg 4
+                4: (15, 10, 35, 10),  # Leg 5
+                5: (15, 10, 35, 10),  # Leg 6
             },
             -4: {  # Backward
-                0: (10, 45, 35, 10),  # Leg 1
-                1: (10, 45, 35, 10),  # Leg 2
-                2: (10, 45, 35, 10),  # Leg 3
-                3: (-10, 45, 35, 10),  # Leg 4
-                4: (-10, 45, 35, 10),  # Leg 5
-                5: (-10, 45, 35, 10),  # Leg 6
+                0: (15, 10, 35, 15),  # Leg 1
+                1: (15, 10, 35, 15),  # Leg 2
+                2: (15, 10, 35, 15),  # Leg 3
+                3: (-15, 10, 35, 15),  # Leg 4
+                4: (-15, 10, 35, 15),  # Leg 5
+                5: (-15, 10, 35, 15),  # Leg 6
             },
             1: {  # Right
-                0: (25, 45, 35, 10),  # Leg 1
-                1: (25, 45, 35, 10),  # Leg 2
-                2: (25, 45, 35, 10),  # Leg 3
-                3: (25, 45, 35, 10),  # Leg 4
-                4: (25, 45, 35, 10),  # Leg 5
-                5: (25, 45, 35, 10),  # Leg 6
+                0: (25, 10, 35, 10),  # Leg 1
+                1: (25, 10, 35, 10),  # Leg 2
+                2: (25, 10, 35, 10),  # Leg 3
+                3: (25, 10, 35, 10),  # Leg 4
+                4: (25, 10, 35, 10),  # Leg 5
+                5: (25, 10, 35, 10),  # Leg 6
             },
             -1: {  # Left
-                0: (-25, 45, 35, 10),  # Leg 1
-                1: (-25, 45, 35, 10),  # Leg 2
-                2: (-25, 45, 35, 10),  # Leg 3
-                3: (-25, 45, 35, 10),  # Leg 4
-                4: (-25, 45, 35, 10),  # Leg 5
-                5: (-25, 45, 35, 10),  # Leg 6
+                0: (-25, 10, 35, 10),  # Leg 1
+                1: (-25, 10, 35, 10),  # Leg 2
+                2: (-25, 10, 35, 10),  # Leg 3
+                3: (-25, 10, 35, 10),  # Leg 4
+                4: (-25, 10, 35, 10),  # Leg 5
+                5: (-25, 10, 35, 10),  # Leg 6
             },
             2: {  # Forward + Right
-                0: (-15, 45, 35, 10),  # Leg 1
-                1: (-15, 45, 35, 10),  # Leg 2
-                2: (-15, 45, 35, 10),  # Leg 3
-                3: (5, 45, 35, 10),  # Leg 4
-                4: (5, 45, 35, 10),  # Leg 5
-                5: (5, 45, 35, 10),  # Leg 6
+                0: (-15, 10, 35, 10),  # Leg 1
+                1: (-15, 10, 35, 10),  # Leg 2
+                2: (-15, 10, 35, 10),  # Leg 3
+                3: (5, 10, 35, 10),  # Leg 4
+                4: (5, 10, 35, 10),  # Leg 5
+                5: (5, 10, 35, 10),  # Leg 6
             },
             -2: {  # Forward + Left
-                0: (-5, 45, 35, 10),  # Leg 1
-                1: (-5, 45, 35, 10),  # Leg 2
-                2: (-5, 45, 35, 10),  # Leg 3
-                3: (-15, 45, 35, 10),  # Leg 4
-                4: (-15, 45, 35, 10),  # Leg 5
-                5: (-15, 45, 35, 10),  # Leg 6
+                0: (-5, 10, 35, 10),  # Leg 1
+                1: (-5, 10, 35, 10),  # Leg 2
+                2: (-5, 10, 35, 10),  # Leg 3
+                3: (-15, 10, 35, 10),  # Leg 4
+                4: (-15, 10, 35, 10),  # Leg 5
+                5: (-15, 10, 35, 10),  # Leg 6
             },
             3: {  # Backward + Right
-                0: (5, 45, 35, 10),  # Leg 1
-                1: (5, 45, 35, 10),  # Leg 2
-                2: (5, 45, 35, 10),  # Leg 3
-                3: (-15, 45, 35, 10),  # Leg 4
-                4: (-15, 45, 35, 10),  # Leg 5
-                5: (-15, 45, 35, 10),  # Leg 6
+                0: (5, 10, 35, 10),  # Leg 1
+                1: (5, 10, 35, 10),  # Leg 2
+                2: (5, 10, 35, 10),  # Leg 3
+                3: (-15, 10, 35, 10),  # Leg 4
+                4: (-15, 10, 35, 10),  # Leg 5
+                5: (-15, 10, 35, 10),  # Leg 6
             },
             -3: {  # Backward + Left
-                0: (-15, 45, 35, 10),  # Leg 1
-                1: (-15, 45, 35, 10),  # Leg 2
-                2: (-15, 45, 35, 10),  # Leg 3
-                3: (-5, 45, 35, 10),  # Leg 4
-                4: (-5, 45, 35, 10),  # Leg 5
-                5: (-5, 45, 35, 10),  # Leg 6
+                0: (-15, 10, 35, 10),  # Leg 1
+                1: (-15, 10, 35, 10),  # Leg 2
+                2: (-15, 10, 35, 10),  # Leg 3
+                3: (-5, 10, 35, 10),  # Leg 4
+                4: (-5, 10, 35, 10),  # Leg 5
+                5: (-5, 10, 35, 10),  # Leg 6
             },
         }
 
@@ -415,7 +414,7 @@ class HexapodControlNode(Node):
     def initialize_legs(self):
         # Initial positions for all legs
         initial_positions = (90, 140, 110, 55)  # (coxa, femur, tibia, tarsus)
-        self.default_positions = (90, 105, 10, 85)  # Store final positions as default positions
+        self.default_positions = (90, 110, 12, 85)  # Store final positions as default positions
         # Adjust step_size and delay_between_steps to control speed and smoothness
         step_size = 4  # Decrease step size for smoother movement, increase for faster movement
         delay_between_steps = 0.05 # Increase delay for smoother movement, decrease for faster movement
@@ -468,7 +467,7 @@ class HexapodControlNode(Node):
         # Move all joints of the leg in the specified sequence
         target_positions = angles
         current_positions = self.last_positions[leg_index]
-        sequence = ["femur", "tibia", "tarsus", "coxa"]  # Desired sequence
+        sequence = [ "femur", "tibia", "tarsus", "coxa"]  # Desired sequence
         move_leg_slowly(leg_index, current_positions, target_positions, step_size=5, delay_between_steps=0.01, sequence=sequence, logger=self.get_logger())
 
         # Update the last known positions
@@ -505,9 +504,6 @@ class HexapodControlNode(Node):
 
             for leg_index in self.current_step:
                 self.lower_leg(leg_index)
-
-            # Advance to the next step in the gait sequence
-            self.current_step = self.gait_controller.step()
 
 def main(args=None):
     rclpy.init(args=args)

@@ -27,7 +27,7 @@ class AMG8833Publisher(Node):
         resized = cv2.resize(pixels, (720, 720), interpolation=cv2.INTER_CUBIC)
 
         # Flip the image vertically
-        flipped = cv2.flip(resized, 0)
+        flipped = cv2.flip(resized, -1)
 
         # Normalize the image for display purposes
         normalized = cv2.normalize(flipped, None, 0, 255, cv2.NORM_MINMAX)

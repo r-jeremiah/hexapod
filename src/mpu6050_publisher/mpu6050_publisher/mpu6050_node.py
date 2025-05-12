@@ -16,7 +16,7 @@ class MPU6050Publisher(Node):
 
         # Initialize Madgwick Filter  # noqa: Madgwick
         self.ahrs = MadgwickAHRS()  # Initialize without arguments  # noqa: ahrs, Madgwick, AHRS
-        self.ahrs.samplePeriod = 0.01  # Set sample period separately  # noqa: ahrs
+        self.ahrs.samplePeriod = 0.5  # Set sample period separately  # noqa: ahrs
         self.ahrs.beta = 0.1  # Set beta as needed  # noqa: ahrs
 
     def publish_data(self):

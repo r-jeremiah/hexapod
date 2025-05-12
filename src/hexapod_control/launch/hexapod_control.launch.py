@@ -21,8 +21,8 @@ def generate_launch_description():
         ),
 
         Node(
-            package='websocket_server',
-            executable='websocket_server_node',
+            package='rosbridge_server',
+            executable='rosbridge_websocket',
             name='websocket_server_node',
             output='screen',
         )
