@@ -257,7 +257,7 @@ class HexapodControlNode(Node):
         elif ch5 >= 1600:  # Tripod Gait
             gait = "tripod"
             if direction == 0:  # Forward
-                gait_sequence = [[0, 2, 4], [1, 3, 5]]
+                gait_sequence = [[1, 3, 5], [0, 2, 4]]
             elif direction == -4:  # Backward
                 gait_sequence = [[1, 3, 5], [0, 2, 4]]
             elif direction == 1:  # Right
@@ -265,13 +265,13 @@ class HexapodControlNode(Node):
             elif direction == -1:  # Left
                 gait_sequence = [[1, 3, 5], [0, 2, 4]]
             elif direction == 2:  # Forward + Right
-                gait_sequence = [[0, 4], [1, 5], [2, 3]]
+                gait_sequence = [[0, 2, 4], [1, 3, 5]]
             elif direction == -2:  # Forward + Left
-                gait_sequence = [[1, 5], [0, 4], [2, 3]]
+                gait_sequence = [[1, 3, 5], [0, 2, 4]]
             elif direction == 3:  # Backward + Right
-                gait_sequence = [[1, 5], [0, 4], [2, 3]]
+                gait_sequence = [[0, 2, 4], [1, 3, 5]]
             elif direction == -3:  # Backward + Left
-                gait_sequence = [[0, 4], [1, 5], [2, 3]]
+                gait_sequence = [[1, 3, 5], [0, 2, 4]]
         else:
             gait = None
             gait_sequence = []
@@ -279,20 +279,20 @@ class HexapodControlNode(Node):
         # Define custom angles for each direction and leg
         custom_angle_offsets = {
             0: {  # Forward
-                0: (-15, 10, 35, 10),  # Leg 1
-                1: (-15, 10, 35, 10),  # Leg 2
-                2: (-15, 10, 35, 10),  # Leg 3
-                3: (15, 10, 35, 10),  # Leg 4
-                4: (15, 10, 35, 10),  # Leg 5
-                5: (15, 10, 35, 10),  # Leg 6
+                0: (-25, 10, 35, 10),  # Leg 1
+                1: (-25, 10, 35, 10),  # Leg 2
+                2: (-25, 10, 35, 10),  # Leg 3
+                3: (25, 10, 35, 10),  # Leg 4
+                4: (25, 10, 35, 10),  # Leg 5
+                5: (25, 10, 35, 10),  # Leg 6
             },
             -4: {  # Backward
-                0: (15, 10, 35, 15),  # Leg 1
-                1: (15, 10, 35, 15),  # Leg 2
-                2: (15, 10, 35, 15),  # Leg 3
-                3: (-15, 10, 35, 15),  # Leg 4
-                4: (-15, 10, 35, 15),  # Leg 5
-                5: (-15, 10, 35, 15),  # Leg 6
+                0: (25, 10, 35, 15),  # Leg 1
+                1: (25, 10, 35, 15),  # Leg 2
+                2: (25, 10, 35, 15),  # Leg 3
+                3: (-25, 10, 35, 15),  # Leg 4
+                4: (-25, 10, 35, 15),  # Leg 5
+                5: (-25, 10, 35, 15),  # Leg 6
             },
             1: {  # Right
                 0: (25, 10, 35, 10),  # Leg 1
@@ -311,36 +311,36 @@ class HexapodControlNode(Node):
                 5: (-25, 10, 35, 10),  # Leg 6
             },
             2: {  # Forward + Right
-                0: (-15, 10, 35, 10),  # Leg 1
-                1: (-15, 10, 35, 10),  # Leg 2
-                2: (-15, 10, 35, 10),  # Leg 3
-                3: (5, 10, 35, 10),  # Leg 4
-                4: (5, 10, 35, 10),  # Leg 5
-                5: (5, 10, 35, 10),  # Leg 6
+                0: (-25, 10, 35, 10),  # Leg 1
+                1: (-25, 10, 35, 10),  # Leg 2
+                2: (-25, 10, 35, 10),  # Leg 3
+                3: (10, 10, 35, 10),  # Leg 4
+                4: (10, 10, 35, 10),  # Leg 5
+                5: (10, 10, 35, 10),  # Leg 6
             },
             -2: {  # Forward + Left
-                0: (-5, 10, 35, 10),  # Leg 1
-                1: (-5, 10, 35, 10),  # Leg 2
-                2: (-5, 10, 35, 10),  # Leg 3
-                3: (-15, 10, 35, 10),  # Leg 4
-                4: (-15, 10, 35, 10),  # Leg 5
-                5: (-15, 10, 35, 10),  # Leg 6
+                0: (10, 10, 35, 10),  # Leg 1
+                1: (10, 10, 35, 10),  # Leg 2
+                2: (10, 10, 35, 10),  # Leg 3
+                3: (-25, 10, 35, 10),  # Leg 4
+                4: (-25, 10, 35, 10),  # Leg 5
+                5: (-25, 10, 35, 10),  # Leg 6
             },
             3: {  # Backward + Right
-                0: (5, 10, 35, 10),  # Leg 1
-                1: (5, 10, 35, 10),  # Leg 2
-                2: (5, 10, 35, 10),  # Leg 3
-                3: (-15, 10, 35, 10),  # Leg 4
-                4: (-15, 10, 35, 10),  # Leg 5
-                5: (-15, 10, 35, 10),  # Leg 6
+                0: (10, 10, 35, 10),  # Leg 1
+                1: (10, 10, 35, 10),  # Leg 2
+                2: (10, 10, 35, 10),  # Leg 3
+                3: (-25, 10, 35, 10),  # Leg 4
+                4: (-25, 10, 35, 10),  # Leg 5
+                5: (-25, 10, 35, 10),  # Leg 6
             },
             -3: {  # Backward + Left
-                0: (-15, 10, 35, 10),  # Leg 1
-                1: (-15, 10, 35, 10),  # Leg 2
-                2: (-15, 10, 35, 10),  # Leg 3
-                3: (-5, 10, 35, 10),  # Leg 4
-                4: (-5, 10, 35, 10),  # Leg 5
-                5: (-5, 10, 35, 10),  # Leg 6
+                0: (25, 10, 35, 10),  # Leg 1
+                1: (25, 10, 35, 10),  # Leg 2
+                2: (25, 10, 35, 10),  # Leg 3
+                3: (-10, 10, 35, 10),  # Leg 4
+                4: (-10, 10, 35, 10),  # Leg 5
+                5: (-10, 10, 35, 10),  # Leg 6
             },
         }
 
@@ -417,8 +417,7 @@ class HexapodControlNode(Node):
         self.default_positions = (90, 110, 10, 85)  # Store final positions as default positions
         # Adjust step_size and delay_between_steps to control speed and smoothness
         step_size = 4  # Decrease step size for smoother movement, increase for faster movement
-        delay_between_steps = 0.05 # Increase delay for smoother movement, decrease for faster movement
-
+        delay_between_steps = 0.05 # Increase def
         # Move all legs to the initial position
         self.get_logger().info("Moving all legs to the initial position...")
         for leg_index in range(6):
